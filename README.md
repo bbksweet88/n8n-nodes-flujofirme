@@ -2,19 +2,25 @@
 
 This package was generated using the official `@n8n/create-node@0.53.2` scaffold (`@n8n/node-cli@0.54.2`) and adapted for one service: the FlujoFirme catalogue of documented workflow failure classes.
 
-## Current release preparation — 26 October 2026
+## Source status — 26 October 2026
 
-The node now supports a free public categorical catalogue API without account
-creation or credentials. Select **Authentication: None**. The exact hosted
-endpoint and independently observed deployment results must be recorded before
-public distribution; an empty or example endpoint is not a deployed service.
-No npm publication, Creator Portal submission, n8n verification or payment is
-established by this source preparation. Jon's response approves the concept
-only provisionally.
+Public source repository:
+https://github.com/bbksweet88/n8n-nodes-flujofirme . Source upload and GitHub CI
+verification are being completed separately. Repository creation does not
+establish a published npm package, a deployed public API or n8n verification.
 
-The former owner-authorized Sites route is retained as an explicit optional
-legacy mode. Public callers do not use or obtain an owner Sites bearer token.
-Historical private-pilot evidence remains unchanged in the parent package.
+The node's existing **Authentication: None** path is intended for the public
+categorical API. It also existed in the earlier prototype; the new source
+change is a configurable finite timeout for hosts that may sleep. **No actual
+public catalogue endpoint has yet been deployed and independently validated.**
+An empty or example Service URL is not a live service. No npm publication,
+Creator Portal submission or payment is established by this preparation.
+Jon's response is preliminary feedback on the concept.
+
+Owner-authorized Sites access remains an optional legacy mode. Public callers
+will not need an owner Sites bearer token. Historical private-pilot evidence
+is retained in the separately archived preparation, not in this public source
+repository.
 
 ## What this version does
 
@@ -28,9 +34,10 @@ This uses a programmatic node to construct and validate the exact outbound allow
 
 ## Public pilot configuration
 
-1. Set **Service URL** to the published FlujoFirme catalogue HTTPS origin.
-2. Leave **Authentication** at **None**. No account, payment, access token or
-   credential is needed by the public categorical endpoint.
+1. Once deployment and external checks succeed, set **Service URL** to the
+   actual published FlujoFirme catalogue HTTPS origin. No URL is asserted yet.
+2. Leave **Authentication** at **None** for that public categorical endpoint.
+   This request path requires no account, payment, access token or credential.
 3. Explicitly select the true node type and error class. Unknown remains
    unknown; an Error Trigger display name does not establish either value.
 4. Keep **Request Timeout (Seconds)** at 90 for a free host that may sleep,
@@ -58,22 +65,45 @@ for existing development evidence, not offered as public reviewer onboarding.
 
 ## Local checks
 
-Node.js 24.19.0 and npm 11.9.0 were available during preparation. Install isolated development dependencies and the n8n host peer, then run:
+The current source update was built and checked under **Node.js 24.22.1**.
+Install the pinned isolated development dependencies, then run:
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
 npm run build
 npm run lint
 npm test
+node --test service/test/*.test.mjs
 ```
 
-No runtime dependencies are declared; the development environment pins `n8n-workflow@2.45.1` for compilation. `n8n-workflow` is supplied by the n8n host as a peer dependency. The helper-call tests use a mock and send no external HTTP request. The adjacent `../service/` tests exercise the local catalogue HTTP service separately.
+The 26 October node build and lint passed, and the current ordinary node
+suite passed **17 tests**. This includes the new configurable-timeout regression
+and the strengthened no-credential public-request check. These mocked helper
+tests make no external HTTP calls. The separate `service/` tests exercise the
+local catalogue HTTP service; see `service/README.md` for listener configuration
+and deployment constraints.
 
-Real n8n execution evidence is recorded separately from the mocked helper tests. Production configuration requires an authorized HTTPS endpoint for the single FlujoFirme service. The node intentionally rejects plain HTTP, including localhost; the local service can be tested separately with its own tests. The private test deployment does not establish public availability or production readiness.
+No runtime dependencies are declared. Development compilation pins
+`n8n-workflow@2.45.1`; the n8n host supplies the workflow peer at runtime.
+The node rejects plain HTTP, including localhost. Test the local HTTP service
+separately, or use an authorized HTTPS origin for actual node integration.
 
-The final compiled node was imported and executed by n8n **2.44.6** with Node.js **24.19.0**, loaded as an isolated custom extension. Local HTTPS validation covered four synthetic items: two matches, an unmatched signature and a handled HTTP 503, with paired-item indices preserved and outbound bodies captured. A separate real n8n execution called the privately hosted API: two authenticated matches, one authenticated unmatched result, and one unauthenticated lookup failure. Default HTTPS certificate validation remained enabled. See `../integration-real/` and `VALIDATION.json` for replay scripts, output and exact hashes. The ordinary unit suite passed 16 tests; those are distinct from the real runtime executions.
+### Historical integration evidence
 
-The current authenticated-pilot execution is separate from those historical runs: three cases passed after the isolated runner was given its existing platform CA trust certificate. Verification of the HTTPS chain stayed enabled. See `../integration-real/evidence-authenticated-pilot/attempt-2-platform-trust/summary.json`; the failed initial configuration is retained alongside it.
+The separately archived 23–24 October preparation includes real n8n **2.44.6**
+custom-extension executions. Local HTTPS validation covered four synthetic
+items: two matches, an unmatched signature and a handled HTTP503, preserving
+pairing. An owner-authorized hosted Sites pilot later returned two documented
+matches and one unmatched result with HTTPS verification enabled, including
+under Node.js **24.22.1**. The earlier ordinary node suite passed **16 tests**.
+Those historical executions are distinct from the current **17-test** local
+suite and do not establish the updated node's public API, npm-installed
+namespace, editor behavior or production availability.
+
+The historical runners, reports and archived validation files are not included
+in this standalone public repository. No missing parent-directory paths are
+required to build or test this source. Historical failures remain preserved in
+the separate archive and are not relabelled as successful public access.
 
 ## Inactive workflow example
 
@@ -85,10 +115,10 @@ The current authenticated-pilot execution is separate from those historical runs
   both warm and genuine post-idle behavior; a warm test alone does not establish
   cold-start reliability or continuous availability.
 - Test final npm installation and editor behavior. The historical custom-
-  extension executions below do not establish npm namespace installation.
+  extension executions do not establish npm namespace installation.
 - Keep the package metadata aligned with the real public repository and the
-  actual service documentation. The planned repository is not evidence of
-  publication or ownership.
+  actual service documentation. Public repository creation does not establish
+  successful CI, an npm release or deployed service access.
 - Run the current official package check, publish through authorized GitHub
   Actions with provenance, verify the published package and submit the real
   version through Creator Portal. See `PUBLICATION.md`.
