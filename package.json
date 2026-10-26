@@ -1,0 +1,60 @@
+{
+  "name": "n8n-nodes-flujofirme",
+  "version": "0.1.0",
+  "description": "Development prototype for the FlujoFirme documented workflow failure catalogue",
+  "license": "MIT",
+  "homepage": "https://flujofirme-catalog-api-20261024.bbksweet.chatgpt.site/",
+  "keywords": [
+    "n8n-community-node-package"
+  ],
+  "author": {
+    "name": "Alberto Gonzalez",
+    "email": "gonzalezalberto53@gmail.com"
+  },
+  "scripts": {
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "test": "node --test test/*.test.cjs"
+  },
+  "files": [
+    "dist/credentials",
+    "dist/nodes",
+    "PUBLICATION.md"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "strict": true,
+    "credentials": [
+      "dist/credentials/FlujofirmeApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Flujofirme/Flujofirme.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@n8n/node-cli": "0.54.2",
+    "typescript": "5.9.2",
+    "eslint": "9.32.0",
+    "prettier": "3.6.2",
+    "n8n-workflow": "2.45.1"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bbksweet88/n8n-nodes-flujofirme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bbksweet88/n8n-nodes-flujofirme/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  }
+}
