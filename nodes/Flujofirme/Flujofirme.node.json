@@ -1,0 +1,15 @@
+{
+  "node": "n8n-nodes-flujofirme",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": [
+    "Development"
+  ],
+  "resources": {
+    "primaryDocumentation": [
+      {
+        "url": "https://flujofirme-catalog-api-20261024.bbksweet.chatgpt.site/"
+      }
+    ]
+  }
+}
