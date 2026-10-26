@@ -5,9 +5,13 @@ This package was generated using the official `@n8n/create-node@0.53.2` scaffold
 ## Source status — 26 October 2026
 
 Public source repository:
-https://github.com/bbksweet88/n8n-nodes-flujofirme . Source upload and GitHub CI
-verification are being completed separately. Repository creation does not
-establish a published npm package, a deployed public API or n8n verification.
+https://github.com/bbksweet88/n8n-nodes-flujofirme . The 29 published source files
+were compared byte-for-byte with the reviewed preparation on 26 October 2026.
+[GitHub CI run 40292881489](https://github.com/bbksweet88/n8n-nodes-flujofirme/actions/runs/40292881489)
+passed installation, lint, build, the 17 ordinary node tests and package preview
+at commit `1025be91162ff33662c68511916d0049f492d1fc`. Separate service tests are not
+part of that CI workflow. This does not establish a published npm package,
+a deployed public API or n8n verification.
 
 The node's existing **Authentication: None** path is intended for the public
 categorical API. It also existed in the earlier prototype; the new source
