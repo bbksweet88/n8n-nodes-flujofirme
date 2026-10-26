@@ -76,11 +76,18 @@ limitations. It does not establish any reproduced repair.
 
 Direct primary documentation checked 24 October 2026 says Render Free Web
 services sleep after 15 minutes idle and take about one minute to wake. The
-current n8n adapter has a 10 second request timeout, so an initial call after
-idle can return `lookup_failed`. This source does not solve that client
-experience and must not be advertised as continuously available or ready
-for formal verification solely because a warm test passes. Do not add
-artificial keep-alive traffic to avoid platform limits.
+current n8n adapter waits 90 seconds by default for each catalogue request,
+configurable from 1 to 120 whole seconds. That longer client timeout allows
+for the documented wake delay, but actual idle/cold-start success against
+the deployed public origin remains unverified. A request can still return
+`lookup_failed` if the service does not respond in the chosen interval.
+
+Separately, the server limits receipt of request headers and the complete
+request to 10 seconds. Those parsing limits apply once the server receives
+traffic; they are distinct from the adapter's wait for a hosted response.
+The pilot must not be advertised as continuously available or ready for
+formal verification solely because a warm test passes. Do not add artificial
+keep-alive traffic to avoid platform limits.
 
 Each workspace receives 750 Free instance hours monthly. Bandwidth and build
 pipeline overages may be charged when a payment method exists; without a
