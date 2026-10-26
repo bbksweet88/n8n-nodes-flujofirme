@@ -1,14 +1,18 @@
 # Publication handoff
 
-This is a local release candidate, not a public npm package or a submitted
-verification request. The planned repository is
-`bbksweet88/n8n-nodes-flujofirme`. Its URL in package metadata does not establish
-that the repository exists or that the connected GitHub app can access it.
+The source repository now exists at
+https://github.com/bbksweet88/n8n-nodes-flujofirme . Source upload and GitHub CI
+verification are still being completed. This is not yet a public npm package
+or a submitted verification request. The connected GitHub app's restricted
+repository access is separate from authenticated browser access; do not infer
+an npm publisher identity from either.
 
 ## Public service availability
 
-The 26 October source revision supports the public categorical API using
-Authentication None, without owner Sites bearer credentials or account setup.
+The existing Authentication None path supports the intended public categorical
+API without owner Sites bearer credentials or account setup. That path already
+existed in the earlier prototype; the 26 October functional change is the
+configurable timeout. No actual public API deployment is established yet.
 The optional legacy credential path is not needed by public users/reviewers.
 This removes service-key issuance from the public design; it does not by itself
 prove the actual hosted endpoint is available.
@@ -23,21 +27,21 @@ infer continuous availability from a successful warm call.
 ## Prepared locally
 
 - MIT license, English README and API documentation link.
-- Package identity and planned public repository metadata.
+- Package identity and metadata naming the newly created public repository.
 - No runtime dependencies; n8n supplies the workflow peer.
 - An explicitly confirmed manual `publish.yml` workflow. Pushes and tags do not
   publish. It builds, lints, runs ordinary unit tests and previews the package
   before `npm publish --provenance --access public`.
 - The workflow uses the patched Node version in `.node-version` and checks the
-  requested package version. It only runs its publish job on the planned
+  requested package version. It only runs its publish job on this
   repository's `main` branch. The package is locally publishable
   (`private: false`); this change does not upload or publish anything.
 
 ## Access required before publication
 
-1. Authorize access to the chosen public GitHub repository and confirm the npm
-   publisher identity belongs to Alberto. The connected GitHub app currently
-   exposes no repositories; this is not evidence that Alberto owns none.
+1. Complete and verify the exact source upload and CI in the public repository,
+   then confirm the npm publisher identity belongs to Alberto. Repository
+   creation alone establishes neither successful checks nor npm authorization.
 2. Check package-name availability again. A public npm registry read on
    24 October 2026 returned HTTP 404 for `n8n-nodes-flujofirme`; this does not
    reserve the name or guarantee publication permission.
@@ -64,7 +68,7 @@ dry-run or a way to bypass authorization.
 
 ## Release and review
 
-After the public repository exists, its checks pass, npm authorization is
+After the source upload is complete, the repository checks pass, npm authorization is
 configured, and the exact candidate is approved for publication, manually run
 the workflow from `main`, enter the exact package version and select the
 publication confirmation. Verify the npm result, provenance, author/repository
@@ -78,8 +82,10 @@ example is inactive and requires explicit local categorical settings; it does
 not classify or repair arbitrary incidents.
 
 Only then sign in to the n8n Creator Portal and submit the actual published
-package. A reviewer must be able to use the recorded public endpoint with Authentication
-None. No service credential or signup is required for that public API. Jon's preliminary email
+package. A reviewer must be able to use the actual independently validated public
+endpoint with Authentication None; this is still a release requirement, not a
+completed deployment. That request path needs no service credential or signup.
+Jon's preliminary email
 does not start formal review or guarantee approval. No paid task or reward is
 established.
 
