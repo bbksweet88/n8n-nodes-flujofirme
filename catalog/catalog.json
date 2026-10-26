@@ -1,0 +1,32 @@
+{
+  "catalogVersion": "0.1.0",
+  "entries": [
+    {
+      "id": "google-sheets-rate-limit",
+      "errorClass": "GOOGLE_SHEETS_RATE_LIMIT",
+      "nodeTypes": ["googlesheets"],
+      "httpStatus": 429,
+      "title": "Google Sheets request quota may be exhausted",
+      "cause": "Google documents per-minute request quotas. A Sheets 429 is consistent with a quota limit, but this catalogue cannot inspect the affected Google project or establish the exact cause.",
+      "recommendation": "Inspect the original response and quota use locally. For confirmed time-based quota failures, reduce request frequency and use bounded exponential backoff with jitter. Inspect the outcome before replaying writes.",
+      "manualTest": ["In a separate authorized test workflow, make one read after the quota window has refilled. Do not generate traffic to force a quota failure.", "Check the Google project's quota usage and original response locally. Compare the observed error with the time-based quota explanation in Google's documentation.", "For writes, inspect the destination before retrying so a previously completed write is not duplicated."],
+      "rollback": ["Save the current workflow configuration before any manual change.", "If a scheduling or retry change causes unwanted delays, restore that configuration and keep the original workflow paused until its writes have been checked."],
+      "sources": [{"url": "https://developers.google.com/workspace/sheets/api/limits", "checkedOn": "2026-10-23"}],
+      "evidenceLevel": "documentation",
+      "limitations": ["No live Google request, customer workflow or repair has been tested.", "This is documentation-backed troubleshooting guidance, not a confirmed root cause or an automatic retry."]
+    },
+    {
+      "id": "structured-output-schema-mismatch",
+      "errorClass": "MODEL_OUTPUT_SCHEMA_MISMATCH",
+      "nodeTypes": ["basicllmchain", "structuredoutputparser"],
+      "title": "Model output may not satisfy the configured schema",
+      "cause": "The selected error class indicates a possible mismatch between generated output and a configured JSON Schema. This service receives no schema or model output and cannot confirm the mismatch.",
+      "recommendation": "Inspect the schema and the model output locally. Check required fields and field types. n8n's generated-from-example schema treats every field as mandatory, and its Structured Output Parser does not support $ref.",
+      "manualTest": ["Copy the workflow into an authorized test environment and use a synthetic model response with the expected field names and types.", "Check that the synthetic response satisfies the parser's configured schema; then review one failing output locally without sending it to this service.", "If using Generate from JSON Example, check whether making every example field mandatory matches the intended contract."],
+      "rollback": ["Export or save the existing prompt and parser configuration before changing them.", "Restore the previous prompt and parser configuration if the change alters downstream data contracts; do not remove validation merely to hide an error."],
+      "sources": [{"url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.outputparserstructured/", "checkedOn": "2026-10-23"}],
+      "evidenceLevel": "documentation",
+      "limitations": ["No model generation, user schema, customer execution or repair has been tested.", "The error class is a local classification hint; it is not proof of a root cause."]
+    }
+  ]
+}
