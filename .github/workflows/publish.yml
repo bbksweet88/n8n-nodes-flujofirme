@@ -1,0 +1,73 @@
+name: Publish confirmed version
+
+# Manual publication only. A push or tag never publishes this package.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Exact package.json version to publish'
+        required: true
+        default: '0.1.0'
+        type: string
+      confirm_publish:
+        description: 'Publish this reviewed public package to npm with provenance'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'bbksweet88/n8n-nodes-flujofirme' && github.ref == 'refs/heads/main' && inputs.confirm_publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.node-version'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+      - name: Check publication identity and runtime
+        env:
+          EXPECTED_VERSION: ${{ inputs.version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          assert.equal(process.version, 'v24.22.1');
+          assert.equal(pkg.name, 'n8n-nodes-flujofirme');
+          assert.equal(pkg.version, process.env.EXPECTED_VERSION);
+          assert.equal(pkg.private, false);
+          assert.equal(pkg.repository.url, 'git+https://github.com/bbksweet88/n8n-nodes-flujofirme.git');
+          NODE
+          npm --version
+      - name: Install build dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+      - name: Preview package contents
+        run: npm pack --dry-run --json
+      - name: Publish with provenance
+        # Prefer configured npm OIDC trust. For the first publication only,
+        # an authorized maintainer may configure a package-scoped granular
+        # NPM_TOKEN secret with minimum permission and expiry.
+        # Never put a token in source or send it in chat.
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
