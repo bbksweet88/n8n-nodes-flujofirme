@@ -1,8 +1,9 @@
 # Publication handoff
 
 The source repository now exists at
-https://github.com/bbksweet88/n8n-nodes-flujofirme . Source upload and GitHub CI
-verification are still being completed. This is not yet a public npm package
+https://github.com/bbksweet88/n8n-nodes-flujofirme . All 29 published files matched
+the reviewed source. GitHub CI run 40292881489 passed at commit
+`1025be91162ff33662c68511916d0049f492d1fc` on 26 October 2026. This is not yet a public npm package
 or a submitted verification request. The connected GitHub app's restricted
 repository access is separate from authenticated browser access; do not infer
 an npm publisher identity from either.
@@ -39,9 +40,9 @@ infer continuous availability from a successful warm call.
 
 ## Access required before publication
 
-1. Complete and verify the exact source upload and CI in the public repository,
-   then confirm the npm publisher identity belongs to Alberto. Repository
-   creation alone establishes neither successful checks nor npm authorization.
+1. Retain the source comparison and successful CI evidence; after any source
+   change, check the actual candidate. Confirm the npm publisher identity
+   belongs to Alberto. GitHub access does not establish npm authorization.
 2. Check package-name availability again. A public npm registry read on
    24 October 2026 returned HTTP 404 for `n8n-nodes-flujofirme`; this does not
    reserve the name or guarantee publication permission.
@@ -62,8 +63,8 @@ infer continuous availability from a successful warm call.
 Every n8n verification release must originate in GitHub Actions with
 provenance. Do not bootstrap with a local `npm publish` and describe it as an
 eligible verification release. npm also offers staged publishing for new
-packages, which creates a public placeholder and later requires personal 2FA
-approval; it is an alternative external publication action, not a local
+packages, which can create a pending package/version requiring maintainer 2FA
+approval before publication; it is an alternative external publication action, not a local
 dry-run or a way to bypass authorization.
 
 ## Release and review
