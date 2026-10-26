@@ -1,0 +1,56 @@
+{
+  "name": "FlujoFirme development Error Workflow — configure before use",
+  "active": false,
+  "nodes": [
+    {
+      "id": "synthetic-error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "synthetic-flujofirme",
+      "name": "FlujoFirme",
+      "type": "n8n-nodes-flujofirme.flujofirme",
+      "typeVersion": 1,
+      "position": [
+        280,
+        0
+      ],
+      "parameters": {
+        "resource": "failure",
+        "operation": "diagnose",
+        "authentication": "none",
+        "serviceUrl": "",
+        "nodeType": "unknown",
+        "errorClass": "UNKNOWN",
+        "nodeVersion": 0,
+        "n8nVersion": "",
+        "httpStatus": 0
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "FlujoFirme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}
