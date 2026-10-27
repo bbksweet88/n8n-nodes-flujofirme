@@ -61,6 +61,8 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm test
+      - name: Check fixed service release configuration
+        run: npm run release:check
       - name: Preview package contents
         run: npm pack --dry-run --json
       - name: Publish with provenance
