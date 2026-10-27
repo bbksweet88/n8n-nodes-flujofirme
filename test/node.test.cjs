@@ -1,9 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const {buildSignature, diagnoseUrl, validateResponse} = require('../dist/nodes/Flujofirme/signature.js');
+const {buildSignature, validateResponse} = require('../dist/nodes/Flujofirme/signature.js');
 const {Flujofirme} = require('../dist/nodes/Flujofirme/Flujofirme.node.js');
-const {FlujofirmeApi} = require('../dist/credentials/FlujofirmeApi.credentials.js');
-const {assertPrivateServiceOrigin} = require('../dist/nodes/Flujofirme/serviceOrigin.js');
+const serviceConfig = require('../dist/nodes/Flujofirme/serviceConfig.js');
+const actualOrigin = serviceConfig.PUBLIC_SERVICE_ORIGIN;
+// Synthetic mocked-helper fixture only. No external HTTP requests are made.
+serviceConfig.PUBLIC_SERVICE_ORIGIN = 'https://flujofirme.invalid';
 const unmatched = () => ({schemaVersion:1,status:'unmatched',catalogVersion:'0.1.0',matches:[],notice:'No documented match.'});
 const parameters = {serviceUrl:'https://flujofirme.invalid',nodeType:'googlesheets',errorClass:'GOOGLE_SHEETS_RATE_LIMIT',nodeVersion:4.6,n8nVersion:'2.18.0',httpStatus:429};
 function context(params, request, fail=false, count=1) {
@@ -19,9 +21,29 @@ test('optional fields are omitted and unknown stays explicit',()=>{
 test('invalid versions and status do not enter the request',()=>{
  for (const field of [{n8nVersion:'2.18.0 customer@example.com'},{nodeVersion:NaN},{nodeVersion:101},{n8nVersion:'2.18.0-rc.1'},{n8nVersion:'2.18.0+customer42'},{httpStatus:429.2},{httpStatus:99},{nodeType:'private-customer-node'},{errorClass:'secret'}]) assert.throws(()=>buildSignature({...parameters,...field}));
 });
-test('service URL appends only the contract path and requires HTTPS',()=>{
- assert.equal(diagnoseUrl('https://flujofirme.invalid/base/'),'https://flujofirme.invalid/base/v1/diagnose');
- for (const url of ['http://localhost:8787','https://user:password@example.com','https://example.com?a=secret','https://example.com/#secret']) assert.throws(()=>diagnoseUrl(url));
+test('the release candidate exposes neither a URL override nor a credential route',()=>{
+ const node=new Flujofirme();
+ assert.equal(node.description.properties.some(p=>p.name==='serviceUrl'||p.name==='authentication'),false);
+ assert.deepEqual(node.description.credentials??[],[]);
+ const metadata=require('../package.json');
+ assert.deepEqual(metadata.n8n.credentials,[]);
+ assert.equal(metadata.files.includes('dist/credentials'),false);
+});
+test('an unconfigured service fails without HTTP even if a legacy workflow supplies an endpoint',async()=>{
+ serviceConfig.PUBLIC_SERVICE_ORIGIN='';
+ try {
+  let calls=0;
+  const result=await Flujofirme.prototype.execute.call(context({...parameters,serviceUrl:'https://user-selected.invalid'},async()=>{calls++;return unmatched();},true));
+  assert.equal(calls,0); assert.equal(result[0][0].json.status,'lookup_failed');
+ } finally {serviceConfig.PUBLIC_SERVICE_ORIGIN='https://flujofirme.invalid';}
+});
+test('fixed endpoint validation requires an HTTPS origin without path, credentials, query or fragment',()=>{
+ try {
+  for(const origin of ['', 'http://localhost:8787','https://localhost','https://127.0.0.1','https://[::1]','https://user:password@example.com','https://example.com/path','https://example.com?a=secret','https://example.com/#secret']) {
+   serviceConfig.PUBLIC_SERVICE_ORIGIN=origin;
+   assert.throws(()=>serviceConfig.publicDiagnosisUrl());
+  }
+ } finally {serviceConfig.PUBLIC_SERVICE_ORIGIN='https://flujofirme.invalid';}
 });
 test('unknown response properties are not exposed as output',()=>{
  assert.deepEqual(validateResponse({...unmatched(),rawExecution:{secret:'PRIVATE'}}),unmatched());
@@ -40,27 +62,17 @@ test('execute uses HTTP helper with exact payload and preserves item linkage',as
  assert.deepEqual(result[0].map(x=>x.pairedItem),[{item:0},{item:1}]);
 });
 
-test('private authentication uses only the n8n credential helper after matching the origin',async()=>{
- const ctx=context({...parameters,authentication:'privateSite'},async()=>assert.fail('Unauthenticated helper must not be used'));
- const credentialCalls=[]; const calls=[];
- ctx.getCredentials=async(type,index)=>{credentialCalls.push({type,index});return {serviceOrigin:'https://flujofirme.invalid',accessToken:'SYNTHETIC_PRIVATE_TOKEN'};};
- ctx.helpers.httpRequestWithAuthentication=async function(type,request){assert.equal(this,ctx);calls.push({type,request});return unmatched();};
- const result=await Flujofirme.prototype.execute.call(ctx);
- assert.deepEqual(credentialCalls,[{type:'flujofirmeApi',index:0}]);
- assert.equal(calls[0].type,'flujofirmeApi'); assert.equal(calls[0].request.disableFollowRedirect,true); assert.equal(calls[0].request.maxRedirects,0);
- assert.deepEqual(calls[0].request.body,buildSignature(parameters));
- assert.equal(JSON.stringify({calls,result}).includes('SYNTHETIC_PRIVATE_TOKEN'),false);
-});
-test('none authentication does not read credentials even when a credential is attached',async()=>{
+test('fixed public service ignores legacy endpoint/authentication fields and attached credentials',async()=>{
  const calls=[];
- const ctx=context({...parameters,authentication:'none'},async request=>{calls.push(request);return unmatched();});
+ const ctx=context({...parameters,serviceUrl:'https://elsewhere.invalid',authentication:'privateSite'},async request=>{calls.push(request);return unmatched();});
  ctx.credentials={flujofirmeApi:{id:'synthetic-id',name:'Attached but unused'}};
  assert.equal((await Flujofirme.prototype.execute.call(ctx))[0][0].json.status,'unmatched');
+ assert.equal(calls[0].url,'https://flujofirme.invalid/v1/diagnose');
  assert.equal(calls[0].headers['OAI-Sites-Authorization'],undefined);
  assert.equal(calls[0].headers.Authorization,undefined);
  assert.equal(calls[0].timeout,90000);
 });
-test('request timeout is configurable for a cold public service but remains bounded',async()=>{
+test('request timeout remains bounded without claiming service reliability',async()=>{
  for(const timeoutSeconds of [1,90,120]) {
   let request;
   await Flujofirme.prototype.execute.call(context({...parameters,timeoutSeconds},async options=>{request=options;return unmatched();}));
@@ -72,39 +84,6 @@ test('request timeout is configurable for a cold public service but remains boun
   ctx.getNodeParameter=(key,_index,fallback)=>key==='timeoutSeconds'?timeoutSeconds:parameters[key]??fallback;
   await assert.rejects(()=>Flujofirme.prototype.execute.call(ctx));
   assert.equal(calls,0);
- }
-});
-test('private authentication refuses mismatched or invalid origins before making an HTTP request',async()=>{
- for(const serviceOrigin of ['',undefined,'https://elsewhere.invalid','http://flujofirme.invalid','https://flujofirme.invalid:8443','https://flujofirme.invalid/path','https://u:p@flujofirme.invalid','https://flujofirme.invalid?token=PRIVATE','https://flujofirme.invalid/#PRIVATE','https://flujofirme.invalid?','https://flujofirme.invalid#','PRIVATE']) {
-  let calls=0; const ctx=context({...parameters,authentication:'privateSite'},async()=>{calls++;return unmatched();});
-  ctx.getCredentials=async()=>({serviceOrigin,accessToken:'SYNTHETIC_PRIVATE_TOKEN'});
-  ctx.helpers.httpRequestWithAuthentication=async()=>{calls++;return unmatched();};
-  await assert.rejects(()=>Flujofirme.prototype.execute.call(ctx),error=>!error.message.includes('PRIVATE'));
-  assert.equal(calls,0);
- }
- assert.doesNotThrow(()=>assertPrivateServiceOrigin('https://flujofirme.invalid/base/v1/diagnose','https://flujofirme.invalid/'));
-});
-test('credential authentication sets the private Site header and prevents redirects',async()=>{
- const credential=new FlujofirmeApi();
- assert.equal(credential.properties.find(p=>p.name==='accessToken').typeOptions.password,true);
- const request=await credential.authenticate({serviceOrigin:'https://flujofirme.invalid',accessToken:'SYNTHETIC_PRIVATE_TOKEN'},{url:'https://flujofirme.invalid/v1/diagnose',headers:{Accept:'application/json'},disableFollowRedirect:false,maxRedirects:10});
- assert.equal(request.headers['OAI-Sites-Authorization'],'Bearer SYNTHETIC_PRIVATE_TOKEN');
- assert.equal(request.headers.Accept,'application/json'); assert.equal(request.disableFollowRedirect,true); assert.equal(request.maxRedirects,0);
- await assert.rejects(()=>credential.authenticate({serviceOrigin:'https://flujofirme.invalid',accessToken:'SYNTHETIC_PRIVATE_TOKEN'},{url:'https://elsewhere.invalid/v1/diagnose'}));
- for(const accessToken of ['', 'PRIVATE\r\nInjected: yes']) await assert.rejects(()=>credential.authenticate({serviceOrigin:'https://flujofirme.invalid',accessToken},{url:'https://flujofirme.invalid/v1/diagnose'}));
-});
-test('authenticated failures do not expose credentials or upstream errors',async()=>{
- const ctx=context({...parameters,authentication:'privateSite'},async()=>assert.fail('Unexpected unauthenticated request'),true);
- ctx.getCredentials=async()=>({serviceOrigin:'https://flujofirme.invalid',accessToken:'SYNTHETIC_PRIVATE_TOKEN'});
- ctx.helpers.httpRequestWithAuthentication=async()=>{throw new Error('OAI-Sites-Authorization: Bearer SYNTHETIC_PRIVATE_TOKEN');};
- const result=await Flujofirme.prototype.execute.call(ctx);
- assert.equal(result[0][0].json.status,'lookup_failed'); assert.equal(JSON.stringify(result).includes('SYNTHETIC_PRIVATE_TOKEN'),false);
-});
-test('missing credentials and unsupported authentication fail before HTTP requests',async()=>{
- for(const authentication of ['privateSite','unsupported']) {
-  let calls=0; const ctx=context({...parameters,authentication},async()=>{calls++;return unmatched();});
-  ctx.helpers.httpRequestWithAuthentication=async()=>{calls++;return unmatched();};
-  await assert.rejects(()=>Flujofirme.prototype.execute.call(ctx)); assert.equal(calls,0);
  }
 });
 test('HTTP failure is explicit and does not copy failure body',async()=>{
@@ -125,5 +104,7 @@ test('invalid request parameters fail before any HTTP helper call',async()=>{
  assert.throws(()=>validateResponse({...unmatched(),matches:[match]}));
 });
  test('workflow example stays inactive with no production endpoint claimed',()=>{
- const workflow=require('../examples/error-workflow.json');assert.equal(workflow.active,false);const node=workflow.nodes.find(n=>n.name==='FlujoFirme');assert.equal(node.parameters.serviceUrl,'');assert.equal(node.parameters.nodeType,'unknown');assert.equal(node.parameters.errorClass,'UNKNOWN');
+ const workflow=require('../examples/error-workflow.json');assert.equal(workflow.active,false);const node=workflow.nodes.find(n=>n.name==='FlujoFirme');assert.equal(node.parameters.serviceUrl,undefined);assert.equal(node.parameters.authentication,undefined);assert.equal(node.parameters.nodeType,'unknown');assert.equal(node.parameters.errorClass,'UNKNOWN');
 });
+
+test.after(()=>{serviceConfig.PUBLIC_SERVICE_ORIGIN=actualOrigin;});
