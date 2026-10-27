@@ -1,97 +1,35 @@
-# Publication handoff
+# Publication handoff — 27 October 2026 candidate
 
-The source repository now exists at
-https://github.com/bbksweet88/n8n-nodes-flujofirme . All 29 published files matched
-the reviewed source. GitHub CI run 40292881489 passed at commit
-`1025be91162ff33662c68511916d0049f492d1fc` on 26 October 2026. This is not yet a public npm package
-or a submitted verification request. The connected GitHub app's restricted
-repository access is separate from authenticated browser access; do not infer
-an npm publisher identity from either.
+**npm publication remains pending.** The fixed public origin https://flujofirme-catalog-api-20261024.bbksweet.chatgpt.site passed anonymous strict-TLS HTTP checks for the two documented matches and unknown result on 27 October 2026. The revised fixed-origin node then passed these three synthetic lookups in actual n8n 2.44.6 as a local custom extension, preserving paired items 0–2 without credentials or a service-URL parameter. The run used Node.js 24.22.1, strict TLS and the environment's explicitly validated platform CA. Installed-package/editor checks and service reliability still need review. Source preparation and preliminary n8n feedback do not start formal review.
 
-## Public service availability
+## Requirements clarified by n8n
 
-The existing Authentication None path supports the intended public categorical
-API without owner Sites bearer credentials or account setup. That path already
-existed in the earlier prototype; the 26 October functional change is the
-configurable timeout. No actual public API deployment is established yet.
-The optional legacy credential path is not needed by public users/reviewers.
-This removes service-key issuance from the public design; it does not by itself
-prove the actual hosted endpoint is available.
+Garrit Franke replied in the existing n8n correspondence on 27 October 2026: keep matching in the external service; a static catalogue with matching in the node moves toward logic nodes, which they are not accepting. Use one stable public service endpoint operated by FlujoFirme rather than free text. A free host waking after idle is a reliability concern. No further pre-review was offered; the subsequent route is npm publication with provenance and Creator Portal submission into the regular queue.
 
-Before release, record the actual independently accessible HTTPS origin and
-three synthetic signature results (two documentation-backed matches and an
-unknown class), plus a genuine post-idle request if the free host sleeps.
-The node defaults to a finite 90-second timeout, configurable from 1 to 120
-seconds. Do not use artificial keep-alives, disable HTTPS verification, or
-infer continuous availability from a successful warm call.
+This local candidate removes user-configurable destinations and authentication from the node. Historical private-site code and evidence remain in the separate archive; no owner bearer credential is part of the proposed public node.
 
-## Prepared locally
+## Service gate
 
-- MIT license, English README and API documentation link.
-- Package identity and metadata naming the newly created public repository.
-- No runtime dependencies; n8n supplies the workflow peer.
-- An explicitly confirmed manual `publish.yml` workflow. Pushes and tags do not
-  publish. It builds, lints, runs ordinary unit tests and previews the package
-  before `npm publish --provenance --access public`.
-- The workflow uses the patched Node version in `.node-version` and checks the
-  requested package version. It only runs its publish job on this
-  repository's `main` branch. The package is locally publishable
-  (`private: false`); this change does not upload or publish anything.
+1. Retain evidence for the actual independently reachable HTTPS service that performs matching externally. The existing Sites origin passed the bounded anonymous HTTP checks; that does not establish continuous availability. Do not invent an origin or reuse a private endpoint merely because its owner can access it.
+2. Retain the 27 October evidence for the two documentation-backed matches and unknown response through ordinary external HTTP and the actual n8n custom-extension node with strict TLS enabled. Assess genuine idle behavior and operation within the hosting limits separately. A warm request or increased timeout does not establish reliability; these synthetic lookups are not workflow repairs.
+3. Keep the source constant `PUBLIC_SERVICE_ORIGIN` at the corroborated exact origin. Update the development notice and README status only when new evidence supports it. Keep it fixed in the package; do not reintroduce a user-supplied URL or runtime environment/filesystem access.
+4. Build, lint, run the ordinary tests and `npm run release:check`. The configuration check prevents empty/placeholder origins from publication but does not perform network validation or certify reliability. Review the recorded external evidence separately.
 
-## Access required before publication
+No artificial keep-alive traffic, card verification, paid hosting or account change is authorized by this preparation. The free Render attempt remains blocked by account-specific card verification unless a supported no-card route is confirmed.
 
-1. Retain the source comparison and successful CI evidence; after any source
-   change, check the actual candidate. Confirm the npm publisher identity
-   belongs to Alberto. GitHub access does not establish npm authorization.
-2. Check package-name availability again. A public npm registry read on
-   24 October 2026 returned HTTP 404 for `n8n-nodes-flujofirme`; this does not
-   reserve the name or guarantee publication permission.
-3. Sign in to npm and complete its required email/2FA steps personally. Never
-   send account passwords, recovery codes or access tokens in chat.
-4. Prefer npm Trusted Publishing once package settings are available:
-   repository owner `bbksweet88`, repository `n8n-nodes-flujofirme`, workflow
-   filename `publish.yml`. Explicitly permit `npm publish` when configuring
-   that publisher; a stage-only publisher cannot run this workflow's publish.
-5. If a brand-new package cannot yet configure that trust, use npm's documented
-   granular-token route for the first GitHub Actions publication. A maintainer
-   must authorize the minimum suitable publish scope and expiry and put it
-   directly into the repository's `NPM_TOKEN` Actions secret. The workflow
-   supports that secret through `NODE_AUTH_TOKEN`. Do not put it in source,
-   workflow parameters, a package archive or chat. Revoke that bootstrap token
-   after configuring and verifying OIDC.
+## npm and Creator Portal
 
-Every n8n verification release must originate in GitHub Actions with
-provenance. Do not bootstrap with a local `npm publish` and describe it as an
-eligible verification release. npm also offers staged publishing for new
-packages, which can create a pending package/version requiring maintainer 2FA
-approval before publication; it is an alternative external publication action, not a local
-dry-run or a way to bypass authorization.
+The public source repository is https://github.com/bbksweet88/n8n-nodes-flujofirme . Its previous CI result does not validate this new local candidate. After any source update, review the exact published source and fresh CI result.
 
-## Release and review
+Confirm the npm publisher identity and package-name availability. The earlier registry 404 did not reserve the name. GitHub access does not establish npm authorization. A maintainer must personally complete any required npm email/2FA steps; do not send passwords, tokens or recovery codes through chat.
 
-After the source upload is complete, the repository checks pass, npm authorization is
-configured, and the exact candidate is approved for publication, manually run
-the workflow from `main`, enter the exact package version and select the
-publication confirmation. Verify the npm result, provenance, author/repository
-match and installed package behavior before submission. The workflow is
-prepared locally but has not run on GitHub.
+Prefer npm Trusted Publishing for repository `bbksweet88/n8n-nodes-flujofirme` and workflow `publish.yml` once package settings allow it. If the first publication needs npm's documented granular-token route, an authorized maintainer must create the minimum suitable scope and expiry and enter it directly in the repository's `NPM_TOKEN` Actions secret, never source or chat. Revoke a bootstrap token after OIDC is configured and verified.
 
-Before claiming verification readiness, complete n8n's required published
-package check and editor/installed-namespace checks. Earlier custom-extension
-tests do not establish npm installation or editor behavior. The Error Trigger
-example is inactive and requires explicit local categorical settings; it does
-not classify or repair arbitrary incidents.
+The manual workflow checks identity/version/runtime, installs, builds, lints, runs ordinary unit tests and the fixed-service configuration gate, previews the package, then publishes with provenance. Pushes and tags do not publish. `prepublishOnly` also checks the fixed service configuration for direct npm publication. Do not run publication until service evidence, publisher access and the exact candidate are reviewed and authorized.
 
-Only then sign in to the n8n Creator Portal and submit the actual published
-package. A reviewer must be able to use the actual independently validated public
-endpoint with Authentication None; this is still a release requirement, not a
-completed deployment. That request path needs no service credential or signup.
-Jon's preliminary email
-does not start formal review or guarantee approval. No paid task or reward is
-established.
+Verify the actual npm version, provenance, author/repository identity and final installed-package namespace/editor behavior. Earlier custom-extension tests do not establish those results. Run n8n's current published-package check, then submit the actual published version through Creator Portal. Formal acceptance, paid work and income remain unestablished.
 
-## Primary requirements checked 24 October 2026
-
+Primary requirements previously checked:
 - https://docs.n8n.io/connect/create-nodes/build-your-node/reference/verification-guidelines.md
 - https://docs.n8n.io/connect/create-nodes/deploy-your-node/submit-community-nodes.md
 - https://docs.npmjs.com/generating-provenance-statements/
