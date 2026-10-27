@@ -17,19 +17,18 @@
     "dev": "n8n-node dev",
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
-    "test": "node --test test/*.test.cjs"
+    "test": "node --test test/*.test.cjs",
+    "release:check": "node scripts/check-release.cjs",
+    "prepublishOnly": "npm run release:check"
   },
   "files": [
-    "dist/credentials",
     "dist/nodes",
     "PUBLICATION.md"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
     "strict": true,
-    "credentials": [
-      "dist/credentials/FlujofirmeApi.credentials.js"
-    ],
+    "credentials": [],
     "nodes": [
       "dist/nodes/Flujofirme/Flujofirme.node.js"
     ]
