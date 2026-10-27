@@ -1,4 +1,4 @@
-# Public catalogue pilot source
+# Standalone catalogue service — separate deployment source
 
 This stateless, zero-dependency Node service returns documentation-backed
 guidance for two categorical failure classes. It neither executes nor changes
@@ -8,8 +8,9 @@ transport metadata such as source IP addresses. Do not send personal data.
 
 This directory and the sibling `catalog/` directory are deployment source.
 The n8n package's explicit `files` whitelist excludes them from its npm tarball.
-The catalogue and diagnosis implementation are byte-identical to the existing
-canonical preparation. `deployment-evidence/summary.json` records their hashes.
+The catalogue and diagnosis implementation are unchanged from the previous
+preparation. This standalone service is not the active Sites deployment
+implementation; do not infer a Render deployment from these files.
 
 ## Local use
 
@@ -24,9 +25,16 @@ The default listener is `127.0.0.1:8787`. `HOST` and `PORT` are explicitly
 configurable; invalid values fail startup. SIGTERM/SIGINT stop the listener
 and allow existing requests up to ten seconds before forced exit.
 
-## Direct Render creation inputs
+## Separate, undeployed Render alternative
 
-Only after the exact source is pushed to an authorized supported Git provider:
+The verified-node candidate currently fixes its public origin to the existing
+Sites service. Anonymous strict-TLS HTTP checks succeeded there on 27 October
+2026; final n8n integration and reliability checks remain separate. The Render
+attempt did not produce a deployed service because the selected account
+requested card verification. No payment details were entered.
+
+These historical creation inputs remain a separate option only if a supported
+free route is confirmed for the correct account:
 
 | Setting | Value |
 | --- | --- |
@@ -103,6 +111,8 @@ Primary documentation read directly:
 - https://render.com/docs/web-services.md
 - https://render.com/docs/compute-plans.md
 
-Current evidence is local only. External HTTP, n8n integration against the
-actual Render origin, idle/cold-start handling and formal publication remain
-separate checks after a deployment is authorized and succeeds.
+Evidence for this standalone Node listener is local only. The separate Sites
+origin passed bounded anonymous HTTP checks; that result does not deploy or
+validate this Render alternative. External n8n integration, genuine idle
+behavior and formal publication must each be established for the actual
+release origin. No service reliability guarantee is established.
