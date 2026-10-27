@@ -25,13 +25,6 @@ export function buildSignature(input: Record<string, unknown>): FailureSignature
  }
  return result;
 }
-export function diagnoseUrl(endpoint: unknown): string {
- if (typeof endpoint !== 'string') throw new Error('Enter the FlujoFirme service URL');
- const url = new URL(endpoint);
- if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) throw new Error('Use an HTTPS service URL without credentials, a query or a fragment');
- url.pathname = url.pathname.replace(/\/$/, '') + '/v1/diagnose';
- return url.toString();
-}
 type JsonRecord = {[key: string]: unknown};
 function record(value: unknown): JsonRecord {
  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid FlujoFirme response');
